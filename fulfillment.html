@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WMS - ระบบหยิบและแพ็กสินค้า</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="config.js"></script>
   <style>
+    body { font-family: 'Prompt', sans-serif; }
     @media print {
       body * { visibility: hidden; }
       #print-label, #print-label * { visibility: visible; }
@@ -17,16 +21,19 @@
 <body class="bg-slate-100 text-slate-800 p-4 md:p-8">
 
   <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
       <div>
         <h1 class="text-2xl font-bold">ระบบจัดการคลังสินค้า (Picking & Packing)</h1>
-        <p class="text-sm text-slate-500">จัดการคำสั่งซื้อจาก Google Sheets แบบเรียลไทม์</p>
+        <p id="wms-status" class="text-sm text-slate-500">กำลังโหลดข้อมูลคำสั่งซื้อ...</p>
       </div>
-      <a href="index.html" class="bg-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium hover:bg-slate-50">← กลับหน้าร้าน</a>
+      <div class="flex items-center gap-2">
+        <button onclick="loadOrders()" class="bg-white border border-slate-200 px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-slate-50">รีเฟรช</button>
+        <a href="index.html" class="bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm text-sm font-medium hover:bg-slate-50">← กลับหน้าร้าน</a>
+      </div>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
-      <button id="tab-PENDING" onclick="filterTab('PENDING')" class="tab-btn bg-amber-500 text-white px-4 py-2 rounded-lg font-semibold">1. รอหยิบสินค้า (Picking)</button>
+      <button id="tab-PENDING" onclick="filterTab('PENDING')" class="tab-btn bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold">1. รอหยิบสินค้า (Picking)</button>
       <button id="tab-PICKED" onclick="filterTab('PICKED')" class="tab-btn bg-white text-slate-700 px-4 py-2 rounded-lg font-semibold">2. รอแพ็กพัสดุ (Packing)</button>
       <button id="tab-PACKED" onclick="filterTab('PACKED')" class="tab-btn bg-white text-slate-700 px-4 py-2 rounded-lg font-semibold">3. แพ็กเสร็จแล้ว (Ready to Ship)</button>
     </div>
@@ -37,19 +44,61 @@
   <div id="print-label" class="hidden"></div>
 
   <script>
+    const LOCAL_ORDERS_KEY = 'PUREBRUSH_LOCAL_ORDERS';
     let allOrders = [];
     let currentTab = 'PENDING';
+    let isApiReady = false;
+
+    function getLocalOrders() {
+      try {
+        return JSON.parse(localStorage.getItem(LOCAL_ORDERS_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setLocalOrders(list) {
+      localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(list));
+    }
+
+    function mergeOrders(remoteList, localList) {
+      const map = new Map();
+      localList.forEach(o => {
+        if (o && o.order_id) map.set(String(o.order_id), o);
+      });
+      remoteList.forEach(o => {
+        if (o && o.order_id) map.set(String(o.order_id), o);
+      });
+      return Array.from(map.values());
+    }
 
     async function loadOrders() {
-      try {
-        const res = await fetch(`${API_URL}?action=getOrders`);
-        const json = await res.json();
-        allOrders = json.data || [];
-        renderOrders();
-      } catch (err) {
-        document.getElementById('orders-container').innerHTML =
-          `<div class="bg-white p-8 rounded-xl text-center text-red-500">ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้ กรุณาตรวจสอบ API_URL ใน config.js</div>`;
+      const statusEl = document.getElementById('wms-status');
+      const localOrders = getLocalOrders();
+      allOrders = localOrders;
+      renderOrders();
+
+      if (typeof API_URL === 'undefined' || !String(API_URL).startsWith('http')) {
+        statusEl.innerText = 'โหมดใช้งานในเครื่อง (แสดงคำสั่งซื้อที่บันทึกไว้ในเบราว์เซอร์)';
+        return;
       }
+
+      try {
+        const res = await fetch(`${API_URL}?action=getOrders`, { redirect: 'follow' });
+        const json = await res.json();
+        if (json && json.status === 'success' && Array.isArray(json.data)) {
+          isApiReady = true;
+          allOrders = mergeOrders(json.data, localOrders);
+          setLocalOrders(allOrders);
+          statusEl.innerHTML = '<span class="text-emerald-600 font-medium">● เชื่อมต่อข้อมูลคำสั่งซื้อเรียบร้อย</span>';
+        } else {
+          statusEl.innerText = 'แสดงคำสั่งซื้อในเครื่อง (ยังไม่มีข้อมูลจากระบบภายนอก)';
+        }
+      } catch (err) {
+        statusEl.innerText = 'แสดงคำสั่งซื้อในเครื่อง (ไม่สามารถเชื่อมต่อ API ได้ในขณะนี้)';
+      }
+
+      renderOrders();
     }
 
     function filterTab(status) {
@@ -67,7 +116,7 @@
 
     function renderOrders() {
       const container = document.getElementById('orders-container');
-      const filtered = allOrders.filter(o => o.status === currentTab);
+      const filtered = allOrders.filter(o => (o.status || 'PENDING') === currentTab);
 
       if (filtered.length === 0) {
         container.innerHTML = `<div class="bg-white p-8 rounded-xl text-center text-slate-400">ไม่มีรายการในสถานะ ${currentTab}</div>`;
@@ -75,17 +124,23 @@
       }
 
       container.innerHTML = filtered.map(order => {
-        const items = JSON.parse(order.items_json || '[]');
+        let items = [];
+        try {
+          items = typeof order.items_json === 'string' ? JSON.parse(order.items_json || '[]') : (order.items || []);
+        } catch (e) {
+          items = [];
+        }
+
         return `
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div class="flex flex-wrap justify-between items-start border-b pb-4 mb-4">
               <div>
                 <span class="font-bold text-lg text-teal-700">${order.order_id}</span>
-                <span class="text-xs text-slate-400 ml-2">${order.timestamp}</span>
-                <p class="font-medium mt-1">ลูกค้า: ${order.customer_name} (${order.phone})</p>
-                <p class="text-sm text-slate-600">ที่อยู่: ${order.address}</p>
+                <span class="text-xs text-slate-400 ml-2">${order.timestamp || ''}</span>
+                <p class="font-medium mt-1">ลูกค้า: ${order.customer_name || '-'} (${order.phone || '-'})</p>
+                <p class="text-sm text-slate-600">ที่อยู่: ${order.address || '-'}</p>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100">${order.status}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100">${order.status || 'PENDING'}</span>
             </div>
 
             <div class="bg-slate-50 p-4 rounded-lg mb-4">
@@ -134,6 +189,7 @@
 
     function allChecked(orderId) {
       const checkboxes = document.querySelectorAll(`.chk-${orderId}`);
+      if (checkboxes.length === 0) return true;
       return Array.from(checkboxes).every(cb => cb.checked);
     }
 
@@ -149,29 +205,60 @@
     }
 
     async function updateStatus(orderId, status, tracking = '') {
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'updateOrderStatus', order_id: orderId, status: status, tracking_number: tracking })
+      allOrders = allOrders.map(o => {
+        if (String(o.order_id) === String(orderId)) {
+          return {
+            ...o,
+            status: status,
+            tracking_number: tracking !== '' ? tracking : (o.tracking_number || '')
+          };
+        }
+        return o;
       });
+      setLocalOrders(allOrders);
+
+      if (isApiReady && typeof API_URL !== 'undefined' && String(API_URL).startsWith('http')) {
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'updateOrderStatus',
+              order_id: orderId,
+              status: status,
+              tracking_number: tracking
+            })
+          });
+        } catch (err) {
+          console.warn('อัปเดตสถานะในเครื่องแล้ว แต่ส่งไปที่ API ไม่สำเร็จ:', err);
+        }
+      }
+
       alert(`อัปเดตสถานะ ${orderId} เป็น ${status} เรียบร้อย`);
-      loadOrders();
+      renderOrders();
     }
 
     function printShippingLabel(orderId) {
-      const order = allOrders.find(o => o.order_id === orderId);
+      const order = allOrders.find(o => String(o.order_id) === String(orderId));
       if (!order) return;
 
-      const items = JSON.parse(order.items_json || '[]');
+      let items = [];
+      try {
+        items = typeof order.items_json === 'string' ? JSON.parse(order.items_json || '[]') : (order.items || []);
+      } catch (e) {
+        items = [];
+      }
+
       const labelDiv = document.getElementById('print-label');
       labelDiv.classList.remove('hidden');
       labelDiv.innerHTML = `
         <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">ใบปะหน้าพัสดุ - PUREBRUSH</h2>
         <p><strong>Order ID:</strong> ${order.order_id} | <strong>Tracking:</strong> ${order.tracking_number || 'N/A'}</p>
         <hr style="margin: 10px 0;">
-        <p><strong>ผู้รับ:</strong> ${order.customer_name}</p>
-        <p><strong>โทร:</strong> ${order.phone}</p>
-        <p><strong>ที่อยู่จัดส่ง:</strong> ${order.address}</p>
+        <p><strong>ผู้รับ:</strong> ${order.customer_name || '-'}</p>
+        <p><strong>โทร:</strong> ${order.phone || '-'}</p>
+        <p><strong>ที่อยู่จัดส่ง:</strong> ${order.address || '-'}</p>
         <hr style="margin: 10px 0;">
         <p><strong>รายการสินค้าในกล่อง:</strong></p>
         <ul>${items.map(i => `<li>- [${i.sku}] ${i.name} (จำนวน ${i.qty} ชิ้น)</li>`).join('')}</ul>
