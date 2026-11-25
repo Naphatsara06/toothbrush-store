@@ -69,17 +69,22 @@
     let cart = {};
 
     async function loadProducts() {
-      const res = await fetch(`${API_URL}?action=getProducts`);
-      const json = await res.json();
-      products = json.data;
-      renderProducts();
+      try {
+        const res = await fetch(`${API_URL}?action=getProducts`);
+        const json = await res.json();
+        products = json.data;
+        renderProducts();
+      } catch (err) {
+        document.getElementById('product-list').innerHTML = 
+          `<p class="text-center col-span-2 text-red-500">ไม่สามารถโหลดข้อมูลสินค้าได้ กรุณาตรวจสอบ API_URL ในไฟล์ config.js</p>`;
+      }
     }
 
     function renderProducts() {
       const container = document.getElementById('product-list');
       container.innerHTML = products.map(p => `
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-          <img src="public${p.image_url}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=${p.sku}'" class="w-full h-56 object-cover bg-slate-100">
+          <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=${p.sku}'" class="w-full h-56 object-cover bg-slate-100">
           <div class="p-6 flex-1 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-teal-600 bg-teal-50 px-2.5 py-1 rounded">SKU: ${p.sku}</span>
