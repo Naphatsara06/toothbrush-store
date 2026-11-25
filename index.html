@@ -1,116 +1,265 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PUREBRUSH - แปรงสีฟันเพื่อสุขภาพเหงือกและฟัน</title>
+  <title>PUREBRUSH - นวัตกรรมแปรงสีฟันเพื่อสุขภาพเหงือกและฟัน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="config.js"></script>
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+<body class="bg-slate-50 text-slate-800 antialiased">
 
   <!-- Navbar -->
-  <nav class="bg-white shadow-sm sticky top-0 z-10">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="text-2xl font-bold text-teal-600">PURE<span class="text-slate-800">BRUSH</span></div>
-      <div class="space-x-4">
-        <a href="#products" class="text-slate-600 hover:text-teal-600">สินค้า</a>
-        <a href="fulfillment.html" class="text-xs bg-slate-200 px-3 py-1.5 rounded-full text-slate-700 hover:bg-slate-300">ระบบคลังสินค้า (WMS)</a>
+  <nav class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+      <a href="#" class="flex items-center space-x-2">
+        <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">P</span>
+        <span class="text-2xl font-bold tracking-tight text-teal-600">PURE<span class="text-slate-800">BRUSH</span></span>
+      </a>
+      <div class="flex items-center space-x-3 sm:space-x-6">
+        <a href="#features" class="hidden sm:inline text-sm font-medium text-slate-600 hover:text-teal-600 transition">จุดเด่น</a>
+        <a href="#products" class="text-sm font-medium text-slate-600 hover:text-teal-600 transition">สินค้า</a>
+        <a href="#checkout" class="text-sm font-medium text-slate-600 hover:text-teal-600 transition">ตะกร้า (<span id="nav-cart-count">0</span>)</a>
+        <a href="fulfillment.html" class="text-xs font-medium bg-slate-900 text-white px-3.5 py-2 rounded-full hover:bg-slate-700 transition shadow-sm">
+          ระบบคลังสินค้า (WMS)
+        </a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <header class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white py-16 px-4 text-center">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">ยิ้มอย่างมั่นใจ เริ่มต้นที่แปรงสีฟันที่ใช่</h1>
-      <p class="text-lg md:text-xl opacity-90 mb-8">นวัตกรรมขนแปรงนุ่มพิเศษ ทำความสะอาดล้ำลึกโดยไม่ทำร้ายผิวเคลือบฟัน</p>
-      <a href="#products" class="bg-white text-teal-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-slate-100 transition">เลือกซื้อสินค้าเลย</a>
+  <header class="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-emerald-50 border-b border-slate-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-14 md:py-20 grid md:grid-cols-2 gap-10 items-center">
+      <div class="space-y-6 text-center md:text-left">
+        <span class="inline-block bg-teal-100 text-teal-800 text-xs font-semibold px-3.5 py-1.5 rounded-full tracking-wide">
+          ✨ ออกแบบโดยผู้เชี่ยวชาญด้านทันตกรรม
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight">
+          ยิ้มอย่างมั่นใจ <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">
+            เริ่มต้นที่แปรงสีฟันที่ใช่
+          </span>
+        </h1>
+        <p class="text-slate-600 text-base sm:text-lg leading-relaxed max-w-lg mx-auto md:mx-0">
+          สัมผัสประสบการณ์การแปรงฟันที่อ่อนโยนด้วยขนแปรงปลายเรียวแหลม 0.01 มม. ซอกซอนล้ำลึก ขจัดคราบพลัคโดยไม่ทำร้ายเหงือกและผิวเคลือบฟัน
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center md:justify-start pt-2">
+          <a href="#products" class="bg-teal-600 text-white font-semibold px-8 py-3.5 rounded-full shadow-lg shadow-teal-600/20 hover:bg-teal-700 transition text-center">
+            เลือกซื้อสินค้าเลย
+          </a>
+          <a href="#features" class="bg-white text-slate-700 font-medium px-8 py-3.5 rounded-full border border-slate-200 hover:bg-slate-50 transition text-center">
+            ดูคุณสมบัติเด่น
+          </a>
+        </div>
+      </div>
+
+      <div class="relative">
+        <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-200">
+          <img 
+            src="https://images.unsplash.com/photo-1559591937-e68214122773?auto=format&fit=crop&w=1000&q=85" 
+            alt="แปรงสีฟัน PUREBRUSH" 
+            class="w-full h-full object-cover"
+          >
+        </div>
+        <div class="hidden sm:flex items-center gap-3 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 absolute -bottom-5 -left-5">
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">✓</div>
+          <div>
+            <p class="text-xs text-slate-400">การันตีคุณภาพ</p>
+            <p class="text-sm font-bold text-slate-800">ขนแปรงนุ่มพิเศษ 0.01 มม.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Products Section -->
-  <section id="products" class="max-w-5xl mx-auto px-4 py-12">
-    <h2 class="text-2xl font-bold text-center mb-8">เลือกสูตรที่เหมาะกับคุณ</h2>
-    <div id="product-list" class="grid md:grid-cols-2 gap-8">
-      <p class="text-center col-span-2 text-slate-500">กำลังโหลดข้อมูลสินค้าจาก Google Sheets...</p>
+  <!-- Features Bar -->
+  <section id="features" class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4">
+        <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl shrink-0">🪥</div>
+        <div>
+          <h3 class="font-bold text-slate-900">ถนอมเหงือกขั้นสุด</h3>
+          <p class="text-sm text-slate-500 mt-1">ลดแรงกดทับขณะแปรง เหมาะสำหรับผู้ที่มีอาการเสียวฟันและเหงือกบอบบาง</p>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">🌿</div>
+        <div>
+          <h3 class="font-bold text-slate-900">ยับยั้งแบคทีเรีย</h3>
+          <p class="text-sm text-slate-500 mt-1">วัสดุขนแปรงลดการสะสมของความชื้นและแบคทีเรียได้ดีกว่าแปรงทั่วไป</p>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">📦</div>
+        <div>
+          <h3 class="font-bold text-slate-900">จัดส่งรวดเร็ว</h3>
+          <p class="text-sm text-slate-500 mt-1">แพ็กสินค้าอย่างพิถีพิถันพร้อมจัดส่งถึงหน้าบ้านคุณภายใน 1-2 วันทำการ</p>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Checkout Section -->
-  <section class="max-w-3xl mx-auto px-4 pb-16">
-    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-100">
-      <h3 class="text-xl font-bold mb-4 border-b pb-2">สรุปรายการสั่งซื้อและที่อยู่จัดส่ง</h3>
-      <div id="cart-items" class="mb-4 text-slate-600 text-sm">ยังไม่มีสินค้าในตะกร้า</div>
-      <div class="text-right text-xl font-bold text-teal-600 mb-6">ยอดรวม: <span id="total-price">0</span> บาท</div>
+  <!-- Products Section -->
+  <section id="products" class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <h2 class="text-3xl font-bold text-slate-900">เลือกสูตรที่เหมาะกับช่องปากของคุณ</h2>
+      <p class="text-slate-500 mt-2">สินค้าคุณภาพ 2 รุ่นยอดนิยม พร้อมส่งตรงจากคลังสินค้า</p>
+    </div>
 
-      <form id="order-form" class="space-y-4">
+    <div id="product-list" class="grid md:grid-cols-2 gap-8"></div>
+  </section>
+
+  <!-- Checkout Section -->
+  <section id="checkout" class="max-w-4xl mx-auto px-4 sm:px-6 py-12 pb-20">
+    <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-lg border border-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
         <div>
-          <label class="block text-sm font-medium mb-1">ชื่อ-นามสกุล ผู้รับ</label>
-          <input type="text" id="cust-name" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500">
+          <h3 class="text-2xl font-bold text-slate-900">สรุปรายการสั่งซื้อ</h3>
+          <p class="text-sm text-slate-500">ตรวจสอบรายการสินค้าและกรอกที่อยู่สำหรับจัดส่ง</p>
+        </div>
+        <span class="bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">เก็บเงินปลายทาง / โอนชำระ</span>
+      </div>
+
+      <!-- Cart Summary Box -->
+      <div class="bg-slate-50 rounded-2xl p-5 mb-6 border border-slate-100">
+        <div id="cart-items" class="space-y-2 text-sm text-slate-600">
+          ยังไม่มีสินค้าในตะกร้า (กรุณากดปุ่ม + ที่รายการสินค้าด้านบน)
+        </div>
+        <div class="border-t border-slate-200 mt-4 pt-4 flex justify-between items-center">
+          <span class="font-medium text-slate-700">ยอดชำระสุทธิ</span>
+          <span class="text-2xl font-bold text-teal-600">฿<span id="total-price">0</span></span>
+        </div>
+      </div>
+
+      <!-- Customer Form -->
+      <form id="order-form" class="space-y-5">
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">ชื่อ-นามสกุล ผู้รับ *</label>
+            <input type="text" id="cust-name" placeholder="เช่น สมชาย ใจดี" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">เบอร์โทรศัพท์ติดต่อ *</label>
+            <input type="tel" id="cust-phone" placeholder="เช่น 0812345678" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">เบอร์โทรศัพท์</label>
-          <input type="tel" id="cust-phone" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500">
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">ที่อยู่จัดส่ง (บ้านเลขที่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์) *</label>
+          <textarea id="cust-address" rows="3" placeholder="กรอกที่อยู่จัดส่งให้ครบถ้วน..." required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">ที่อยู่จัดส่ง (พร้อมรหัสไปรษณีย์)</label>
-          <textarea id="cust-address" rows="3" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500"></textarea>
-        </div>
-        <button type="submit" id="submit-btn" class="w-full bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition">
-          ยืนยันการสั่งซื้อ
+        <button type="submit" id="submit-btn" class="w-full bg-teal-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-600/20 hover:bg-teal-700 transition text-lg">
+          ยืนยันการสั่งซื้อสินค้า
         </button>
       </form>
     </div>
   </section>
 
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm">
+    <p>© 2026 PUREBRUSH Thailand. All rights reserved.</p>
+  </footer>
+
   <script>
-    let products = [];
+    // ข้อมูลสินค้าเริ่มต้นพร้อมรูปภาพ (แสดงผลทันทีและอัปเดตทับจาก Google Sheets อัตโนมัติ)
+    const DEFAULT_PRODUCTS = [
+      {
+        sku: "TB-SOFT-01",
+        name: "แปรงสีฟันขนนุ่มพิเศษ รุ่น Ultra Soft",
+        description: "ขนแปรงเรียวแหลม 0.01 มม. หนาแน่นพิเศษ ถนอมเหงือก ลดอาการเสียวฟัน เหมาะสำหรับทุกสภาพช่องปาก",
+        price: 89,
+        stock: 100,
+        image_url: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=85",
+        location: "Shelf A1-01"
+      },
+      {
+        sku: "TB-CHAR-02",
+        name: "แปรงสีฟันถ่านชาร์โคล รุ่น Deep Clean",
+        description: "ขนแปรงผสมผงถ่านไม้ไผ่ญี่ปุ่น ช่วยดูดซับกลิ่นปาก ขจัดคราบชา กาแฟ และคราบพลัคได้อย่างล้ำลึก",
+        price: 119,
+        stock: 80,
+        image_url: "https://images.unsplash.com/photo-1597075687490-8f673c6c17f6?auto=format&fit=crop&w=800&q=85",
+        location: "Shelf A1-02"
+      }
+    ];
+
+    let products = [...DEFAULT_PRODUCTS];
     let cart = {};
 
+    function getValidImage(url, sku) {
+      if (!url || url.startsWith('/images/')) {
+        const fallback = DEFAULT_PRODUCTS.find(p => p.sku === sku);
+        return fallback ? fallback.image_url : 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=85';
+      }
+      return url;
+    }
+
     async function loadProducts() {
+      // แสดงสินค้าพร้อมรูปภาพทันทีก่อน
+      renderProducts();
+
+      // ซิงก์ข้อมูลล่าสุดจาก Google Sheets (ถ้าตั้งค่า API_URL ถูกต้อง)
+      if (typeof API_URL === 'undefined' || !API_URL.startsWith('http')) return;
+
       try {
         const res = await fetch(`${API_URL}?action=getProducts`);
         const json = await res.json();
-        products = json.data;
-        renderProducts();
+        if (json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+          products = json.data.map(item => ({
+            ...item,
+            image_url: getValidImage(item.image_url, item.sku)
+          }));
+          renderProducts();
+        }
       } catch (err) {
-        document.getElementById('product-list').innerHTML = 
-          `<p class="text-center col-span-2 text-green-500">ส่งข้อมูล สั่งซื้อสําเร็จ</p>`;
+        console.warn('ใช้ข้อมูลสินค้าเริ่มต้นเนื่องจากไม่สามารถดึงข้อมูลจาก API_URL ได้:', err);
       }
     }
 
     function renderProducts() {
       const container = document.getElementById('product-list');
-      container.innerHTML = products.map(p => `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-          <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=${p.sku}'" class="w-full h-56 object-cover bg-slate-100">
-          <div class="p-6 flex-1 flex flex-col justify-between">
-            <div>
-              <span class="text-xs font-semibold text-teal-600 bg-teal-50 px-2.5 py-1 rounded">SKU: ${p.sku}</span>
-              <h3 class="text-xl font-bold mt-2">${p.name}</h3>
-              <p class="text-slate-500 text-sm mt-2">${p.description}</p>
+      container.innerHTML = products.map(p => {
+        const currentQty = cart[p.sku] || 0;
+        return `
+          <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl transition duration-300 border border-slate-100 overflow-hidden flex flex-col">
+            <div class="relative h-64 bg-slate-100 overflow-hidden">
+              <img src="${p.image_url}" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+              <span class="absolute top-4 left-4 text-xs font-bold text-teal-800 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-sm">
+                SKU: ${p.sku}
+              </span>
             </div>
-            <div class="mt-6 flex items-center justify-between">
+            <div class="p-6 sm:p-8 flex-1 flex flex-col justify-between">
               <div>
-                <span class="text-2xl font-bold text-slate-800">฿${p.price}</span>
-                <span class="block text-xs text-slate-400">คงเหลือ ${p.stock} ชิ้น</span>
+                <h3 class="text-xl font-bold text-slate-900">${p.name}</h3>
+                <p class="text-slate-500 text-sm mt-2 leading-relaxed">${p.description}</p>
               </div>
-              <div class="flex items-center space-x-2">
-                <button onclick="updateCart('${p.sku}', -1)" class="w-8 h-8 rounded-full bg-slate-200 font-bold">-</button>
-                <span id="qty-${p.sku}" class="w-6 text-center font-semibold">0</span>
-                <button onclick="updateCart('${p.sku}', 1)" class="w-8 h-8 rounded-full bg-teal-600 text-white font-bold">+</button>
+              <div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-3xl font-bold text-teal-600">฿${p.price}</span>
+                  <span class="block text-xs text-slate-400 mt-0.5">พร้อมส่ง (${p.stock} ชิ้น)</span>
+                </div>
+                <div class="flex items-center space-x-3 bg-slate-50 p-1.5 rounded-full border border-slate-200">
+                  <button type="button" onclick="updateCart('${p.sku}', -1)" class="w-9 h-9 rounded-full bg-white text-slate-700 font-bold shadow-sm hover:bg-slate-100 transition">-</button>
+                  <span id="qty-${p.sku}" class="w-6 text-center font-bold text-slate-800">${currentQty}</span>
+                  <button type="button" onclick="updateCart('${p.sku}', 1)" class="w-9 h-9 rounded-full bg-teal-600 text-white font-bold shadow-sm hover:bg-teal-700 transition">+</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function updateCart(sku, change) {
       const prod = products.find(p => p.sku === sku);
+      if (!prod) return;
       const current = cart[sku] || 0;
-      const next = Math.max(0, Math.min(prod.stock, current + change));
+      const next = Math.max(0, Math.min(Number(prod.stock), current + change));
       cart[sku] = next;
       document.getElementById(`qty-${sku}`).innerText = next;
       renderCartSummary();
@@ -119,19 +268,26 @@
     function renderCartSummary() {
       const cartDiv = document.getElementById('cart-items');
       let total = 0;
+      let totalQty = 0;
       let html = '';
 
       Object.keys(cart).forEach(sku => {
         if (cart[sku] > 0) {
           const prod = products.find(p => p.sku === sku);
-          const sub = prod.price * cart[sku];
+          const sub = Number(prod.price) * cart[sku];
           total += sub;
-          html += `<div class="flex justify-between py-1"><span>${prod.name} x ${cart[sku]}</span><span>฿${sub}</span></div>`;
+          totalQty += cart[sku];
+          html += `
+            <div class="flex justify-between items-center py-1.5">
+              <span class="font-medium text-slate-800">${prod.name} <span class="text-teal-600 font-bold">x ${cart[sku]}</span></span>
+              <span class="font-semibold text-slate-800">฿${sub}</span>
+            </div>`;
         }
       });
 
-      cartDiv.innerHTML = html || 'ยังไม่มีสินค้าในตะกร้า';
+      cartDiv.innerHTML = html || 'ยังไม่มีสินค้าในตะกร้า (กรุณากดปุ่ม + ที่รายการสินค้าด้านบน)';
       document.getElementById('total-price').innerText = total;
+      document.getElementById('nav-cart-count').innerText = totalQty;
     }
 
     document.getElementById('order-form').addEventListener('submit', async (e) => {
@@ -141,7 +297,7 @@
         return { sku: prod.sku, name: prod.name, qty: cart[sku], location: prod.location };
       });
 
-      if (items.length === 0) return alert('กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น');
+      if (items.length === 0) return alert('กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้นก่อนยืนยันการสั่งซื้อ');
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
@@ -156,15 +312,26 @@
         total_price: Number(document.getElementById('total-price').innerText)
       };
 
-      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-      const result = await res.json();
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
 
-      if (result.status === 'success') {
-        alert(`สั่งซื้อสำเร็จ! รหัสคำสั่งซื้อของคุณคือ: ${result.order_id}`);
-        location.reload();
-      } else {
-        alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+        if (result.status === 'success') {
+          alert(`สั่งซื้อสำเร็จ! รหัสคำสั่งซื้อของคุณคือ: ${result.order_id}`);
+          location.reload();
+        } else {
+          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่');
+          btn.disabled = false;
+          btn.innerText = 'ยืนยันการสั่งซื้อสินค้า';
+        }
+      } catch (err) {
+        alert('ไม่สามารถเชื่อมต่อ Google Sheets ได้ กรุณาตรวจสอบสิทธิ์ Web App (Anyone) ใน Apps Script');
         btn.disabled = false;
+        btn.innerText = 'ยืนยันการสั่งซื้อสินค้า';
       }
     });
 
