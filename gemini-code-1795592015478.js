@@ -1,1 +1,0 @@
-const API_URL = "วาง_WEB_APP_URL_ของคุณที่นี่";
