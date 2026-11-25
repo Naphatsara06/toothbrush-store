@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUREBRUSH - แปรงสีฟันเพื่อสุขภาพเหงือกและฟัน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="config.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="text-2xl font-bold text-teal-600">PURE<span class="text-slate-800">BRUSH</span></div>
+      <div class="space-x-4">
+        <a href="#products" class="text-slate-600 hover:text-teal-600">สินค้า</a>
+        <a href="fulfillment.html" class="text-xs bg-slate-200 px-3 py-1.5 rounded-full text-slate-700 hover:bg-slate-300">ระบบคลังสินค้า (WMS)</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white py-16 px-4 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">ยิ้มอย่างมั่นใจ เริ่มต้นที่แปรงสีฟันที่ใช่</h1>
+      <p class="text-lg md:text-xl opacity-90 mb-8">นวัตกรรมขนแปรงนุ่มพิเศษ ทำความสะอาดล้ำลึกโดยไม่ทำร้ายผิวเคลือบฟัน</p>
+      <a href="#products" class="bg-white text-teal-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-slate-100 transition">เลือกซื้อสินค้าเลย</a>
+    </div>
+  </header>
+
+  <!-- Products Section -->
+  <section id="products" class="max-w-5xl mx-auto px-4 py-12">
+    <h2 class="text-2xl font-bold text-center mb-8">เลือกสูตรที่เหมาะกับคุณ</h2>
+    <div id="product-list" class="grid md:grid-cols-2 gap-8">
+      <p class="text-center col-span-2 text-slate-500">กำลังโหลดข้อมูลสินค้าจาก Google Sheets...</p>
+    </div>
+  </section>
+
+  <!-- Checkout Section -->
+  <section class="max-w-3xl mx-auto px-4 pb-16">
+    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-100">
+      <h3 class="text-xl font-bold mb-4 border-b pb-2">สรุปรายการสั่งซื้อและที่อยู่จัดส่ง</h3>
+      <div id="cart-items" class="mb-4 text-slate-600 text-sm">ยังไม่มีสินค้าในตะกร้า</div>
+      <div class="text-right text-xl font-bold text-teal-600 mb-6">ยอดรวม: <span id="total-price">0</span> บาท</div>
+
+      <form id="order-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">ชื่อ-นามสกุล ผู้รับ</label>
+          <input type="text" id="cust-name" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">เบอร์โทรศัพท์</label>
+          <input type="tel" id="cust-phone" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">ที่อยู่จัดส่ง (พร้อมรหัสไปรษณีย์)</label>
+          <textarea id="cust-address" rows="3" required class="w-full border rounded-lg px-3 py-2 focus:outline-teal-500"></textarea>
+        </div>
+        <button type="submit" id="submit-btn" class="w-full bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition">
+          ยืนยันการสั่งซื้อ
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    let products = [];
+    let cart = {};
+
+    async function loadProducts() {
+      const res = await fetch(`${API_URL}?action=getProducts`);
+      const json = await res.json();
+      products = json.data;
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const container = document.getElementById('product-list');
+      container.innerHTML = products.map(p => `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+          <img src="public${p.image_url}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=${p.sku}'" class="w-full h-56 object-cover bg-slate-100">
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-semibold text-teal-600 bg-teal-50 px-2.5 py-1 rounded">SKU: ${p.sku}</span>
+              <h3 class="text-xl font-bold mt-2">${p.name}</h3>
+              <p class="text-slate-500 text-sm mt-2">${p.description}</p>
+            </div>
+            <div class="mt-6 flex items-center justify-between">
+              <div>
+                <span class="text-2xl font-bold text-slate-800">฿${p.price}</span>
+                <span class="block text-xs text-slate-400">คงเหลือ ${p.stock} ชิ้น</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="updateCart('${p.sku}', -1)" class="w-8 h-8 rounded-full bg-slate-200 font-bold">-</button>
+                <span id="qty-${p.sku}" class="w-6 text-center font-semibold">0</span>
+                <button onclick="updateCart('${p.sku}', 1)" class="w-8 h-8 rounded-full bg-teal-600 text-white font-bold">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateCart(sku, change) {
+      const prod = products.find(p => p.sku === sku);
+      const current = cart[sku] || 0;
+      const next = Math.max(0, Math.min(prod.stock, current + change));
+      cart[sku] = next;
+      document.getElementById(`qty-${sku}`).innerText = next;
+      renderCartSummary();
+    }
+
+    function renderCartSummary() {
+      const cartDiv = document.getElementById('cart-items');
+      let total = 0;
+      let html = '';
+
+      Object.keys(cart).forEach(sku => {
+        if (cart[sku] > 0) {
+          const prod = products.find(p => p.sku === sku);
+          const sub = prod.price * cart[sku];
+          total += sub;
+          html += `<div class="flex justify-between py-1"><span>${prod.name} x ${cart[sku]}</span><span>฿${sub}</span></div>`;
+        }
+      });
+
+      cartDiv.innerHTML = html || 'ยังไม่มีสินค้าในตะกร้า';
+      document.getElementById('total-price').innerText = total;
+    }
+
+    document.getElementById('order-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const items = Object.keys(cart).filter(sku => cart[sku] > 0).map(sku => {
+        const prod = products.find(p => p.sku === sku);
+        return { sku: prod.sku, name: prod.name, qty: cart[sku], location: prod.location };
+      });
+
+      if (items.length === 0) return alert('กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น');
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'กำลังบันทึกคำสั่งซื้อ...';
+
+      const payload = {
+        action: 'createOrder',
+        customer_name: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        address: document.getElementById('cust-address').value,
+        items: items,
+        total_price: Number(document.getElementById('total-price').innerText)
+      };
+
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const result = await res.json();
+
+      if (result.status === 'success') {
+        alert(`สั่งซื้อสำเร็จ! รหัสคำสั่งซื้อของคุณคือ: ${result.order_id}`);
+        location.reload();
+      } else {
+        alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+        btn.disabled = false;
+      }
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>
