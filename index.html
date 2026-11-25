@@ -61,9 +61,10 @@
 
       <div class="relative">
         <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-200">
-          <img 
-            src="https://images.unsplash.com/photo-1559591937-e68214122773?auto=format&fit=crop&w=1000&q=85" 
-            alt="แปรงสีฟัน PUREBRUSH" 
+          <img
+            src="./images.jpeg"
+            alt="แปรงสีฟัน PUREBRUSH"
+            onerror="this.src='https://images.unsplash.com/photo-1559591937-e68214122773?auto=format&fit=crop&w=1000&q=85'"
             class="w-full h-full object-cover"
           >
         </div>
@@ -110,6 +111,7 @@
     <div class="text-center max-w-2xl mx-auto mb-10">
       <h2 class="text-3xl font-bold text-slate-900">เลือกสูตรที่เหมาะกับช่องปากของคุณ</h2>
       <p class="text-slate-500 mt-2">สินค้าคุณภาพ 2 รุ่นยอดนิยม พร้อมส่งตรงจากคลังสินค้า</p>
+      <p id="sync-status" class="text-xs text-slate-400 mt-2">กำลังตรวจสอบการเชื่อมต่อฐานข้อมูล...</p>
     </div>
 
     <div id="product-list" class="grid md:grid-cols-2 gap-8"></div>
@@ -126,7 +128,6 @@
         <span class="bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">เก็บเงินปลายทาง / โอนชำระ</span>
       </div>
 
-      <!-- Cart Summary Box -->
       <div class="bg-slate-50 rounded-2xl p-5 mb-6 border border-slate-100">
         <div id="cart-items" class="space-y-2 text-sm text-slate-600">
           ยังไม่มีสินค้าในตะกร้า (กรุณากดปุ่ม + ที่รายการสินค้าด้านบน)
@@ -137,7 +138,6 @@
         </div>
       </div>
 
-      <!-- Customer Form -->
       <form id="order-form" class="space-y-5">
         <div class="grid sm:grid-cols-2 gap-5">
           <div>
@@ -166,7 +166,8 @@
   </footer>
 
   <script>
-    // ข้อมูลสินค้าเริ่มต้นพร้อมรูปภาพ (แสดงผลทันทีและอัปเดตทับจาก Google Sheets อัตโนมัติ)
+    const LOCAL_ORDERS_KEY = 'PUREBRUSH_LOCAL_ORDERS';
+
     const DEFAULT_PRODUCTS = [
       {
         sku: "TB-SOFT-01",
@@ -174,7 +175,8 @@
         description: "ขนแปรงเรียวแหลม 0.01 มม. หนาแน่นพิเศษ ถนอมเหงือก ลดอาการเสียวฟัน เหมาะสำหรับทุกสภาพช่องปาก",
         price: 89,
         stock: 100,
-        image_url: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=85",
+        image_url: "./IMAGE22.jpeg",
+        fallback_url: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=85",
         location: "Shelf A1-01"
       },
       {
@@ -183,41 +185,53 @@
         description: "ขนแปรงผสมผงถ่านไม้ไผ่ญี่ปุ่น ช่วยดูดซับกลิ่นปาก ขจัดคราบชา กาแฟ และคราบพลัคได้อย่างล้ำลึก",
         price: 119,
         stock: 80,
-        image_url: "https://images.unsplash.com/photo-1597075687490-8f673c6c17f6?auto=format&fit=crop&w=800&q=85",
+        image_url: "./IMAGE2.jpeg",
+        fallback_url: "https://images.unsplash.com/photo-1597075687490-8f673c6c17f6?auto=format&fit=crop&w=800&q=85",
         location: "Shelf A1-02"
       }
     ];
 
     let products = [...DEFAULT_PRODUCTS];
     let cart = {};
+    let isApiConnected = false;
 
-    function getValidImage(url, sku) {
-      if (!url || url.startsWith('/images/')) {
-        const fallback = DEFAULT_PRODUCTS.find(p => p.sku === sku);
-        return fallback ? fallback.image_url : 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=85';
-      }
-      return url;
+    function resolveProduct(item) {
+      const def = DEFAULT_PRODUCTS.find(d => d.sku === item.sku) || DEFAULT_PRODUCTS[0];
+      const img = (!item.image_url || String(item.image_url).trim() === '') ? def.image_url : String(item.image_url).trim();
+      return {
+        sku: item.sku || def.sku,
+        name: item.name || def.name,
+        description: item.description || def.description,
+        price: Number(item.price ?? def.price),
+        stock: Number(item.stock ?? def.stock),
+        image_url: img,
+        fallback_url: def.fallback_url,
+        location: item.location || def.location
+      };
     }
 
     async function loadProducts() {
-      // แสดงสินค้าพร้อมรูปภาพทันทีก่อน
       renderProducts();
+      const statusEl = document.getElementById('sync-status');
 
-      // ซิงก์ข้อมูลล่าสุดจาก Google Sheets (ถ้าตั้งค่า API_URL ถูกต้อง)
-      if (typeof API_URL === 'undefined' || !API_URL.startsWith('http')) return;
+      if (typeof API_URL === 'undefined' || !String(API_URL).startsWith('http')) {
+        statusEl.innerHTML = '<span class="text-amber-600">โหมดทดลองใช้งานในเครื่อง (ยังไม่ได้ตั้งค่า API_URL ใน config.js)</span>';
+        return;
+      }
 
       try {
-        const res = await fetch(`${API_URL}?action=getProducts`);
+        const res = await fetch(`${API_URL}?action=getProducts`, { redirect: 'follow' });
         const json = await res.json();
-        if (json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
-          products = json.data.map(item => ({
-            ...item,
-            image_url: getValidImage(item.image_url, item.sku)
-          }));
+        if (json && json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+          products = json.data.map(resolveProduct);
+          isApiConnected = true;
           renderProducts();
+          statusEl.innerHTML = '<span class="text-emerald-600 font-medium">● เชื่อมต่อข้อมูลสินค้าสำเร็จ</span>';
+        } else {
+          statusEl.innerHTML = '<span class="text-amber-600">ใช้ข้อมูลสินค้าเริ่มต้น (ตรวจสอบการตอบกลับของ API)</span>';
         }
       } catch (err) {
-        console.warn('ใช้ข้อมูลสินค้าเริ่มต้นเนื่องจากไม่สามารถดึงข้อมูลจาก API_URL ได้:', err);
+        statusEl.innerHTML = '<span class="text-amber-600">ใช้ข้อมูลสินค้าเริ่มต้น (ไม่สามารถเชื่อมต่อ API ได้ในขณะนี้)</span>';
       }
     }
 
@@ -228,7 +242,7 @@
         return `
           <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl transition duration-300 border border-slate-100 overflow-hidden flex flex-col">
             <div class="relative h-64 bg-slate-100 overflow-hidden">
-              <img src="${p.image_url}" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+              <img src="${p.image_url}" alt="${p.name}" onerror="this.src='${p.fallback_url}'" class="w-full h-full object-cover hover:scale-105 transition duration-500">
               <span class="absolute top-4 left-4 text-xs font-bold text-teal-800 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-sm">
                 SKU: ${p.sku}
               </span>
@@ -290,6 +304,12 @@
       document.getElementById('nav-cart-count').innerText = totalQty;
     }
 
+    function saveLocalOrder(orderObj) {
+      const existing = JSON.parse(localStorage.getItem(LOCAL_ORDERS_KEY) || '[]');
+      existing.unshift(orderObj);
+      localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(existing));
+    }
+
     document.getElementById('order-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const items = Object.keys(cart).filter(sku => cart[sku] > 0).map(sku => {
@@ -303,35 +323,55 @@
       btn.disabled = true;
       btn.innerText = 'กำลังบันทึกคำสั่งซื้อ...';
 
+      const customerName = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const totalPrice = Number(document.getElementById('total-price').innerText);
+
       const payload = {
         action: 'createOrder',
-        customer_name: document.getElementById('cust-name').value,
-        phone: document.getElementById('cust-phone').value,
-        address: document.getElementById('cust-address').value,
+        customer_name: customerName,
+        phone: phone,
+        address: address,
         items: items,
-        total_price: Number(document.getElementById('total-price').innerText)
+        total_price: totalPrice
       };
+
+      const fallbackOrderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+      const localOrderRecord = {
+        order_id: fallbackOrderId,
+        timestamp: new Date().toLocaleString('th-TH'),
+        customer_name: customerName,
+        phone: phone,
+        address: address,
+        items_json: JSON.stringify(items),
+        total_price: totalPrice,
+        status: 'PENDING',
+        tracking_number: ''
+      };
+
+      if (!isApiConnected || typeof API_URL === 'undefined' || !String(API_URL).startsWith('http')) {
+        saveLocalOrder(localOrderRecord);
+        alert(`บันทึกคำสั่งซื้อเรียบร้อย (โหมดทดลองในเครื่อง)\nรหัสคำสั่งซื้อ: ${fallbackOrderId}\nสามารถไปดูและแพ็กสินค้าต่อได้ที่หน้า "ระบบคลังสินค้า (WMS)"`);
+        location.reload();
+        return;
+      }
 
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
         const result = await res.json();
 
         if (result.status === 'success') {
-          alert(`สั่งซื้อสำเร็จ! รหัสคำสั่งซื้อของคุณคือ: ${result.order_id}`);
-          location.reload();
-        } else {
-          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่');
-          btn.disabled = false;
-          btn.innerText = 'ยืนยันการสั่งซื้อสินค้า';
-        }
-      } catch (err) {
-        alert('ไม่สามารถเชื่อมต่อ Google Sheets ได้ กรุณาตรวจสอบสิทธิ์ Web App (Anyone) ใน Apps Script');
-        btn.disabled = false;
-        btn.innerText = 'ยืนยันการสั่งซื้อสินค้า';
+          localOrderRecord.order_id = result.order_id || fallbackOrderId;
+          saveLocalOrder(localOrderRecord);
+          alert(`สั่งซื้อสำเร็จ! รหัสคำสั่งซื้อของคุณคือ: ${localOrderRecord.order_id}`); location.reload(); } else { saveLocalOrder(localOrderRecord); 
+            alert(`บันทึกคำสั่งซื้อในเครื่องแล้ว (รหัส: ${fallbackOrderId})\nหมายเหตุจากระบบ:`); location.reload(); } } catch (err) { saveLocalOrder(localOrderRecord); alert(`บันทึกคำสั่งซื้อในเครื่องแล้ว (รหัส: ${fallbackOrderId})\nสามารถไปใช้งานหน้า Picking/Packing ที่ระบบคลังสินค้า (WMS) ได้ทันที`);
+        location.reload();
       }
     });
 
